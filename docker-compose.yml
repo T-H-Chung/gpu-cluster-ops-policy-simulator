@@ -1,0 +1,56 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "${GPU_OPS_BIND_ADDRESS:-127.0.0.1}:8000:8000"
+    environment:
+      GPU_OPS_DB_PATH: /app/data/simulator.db
+      GPU_OPS_AUTH_ENABLED: "${GPU_OPS_AUTH_ENABLED:-false}"
+      GPU_OPS_API_KEYS: "${GPU_OPS_API_KEYS:-{}}"
+      GPU_OPS_AUDIT_RETENTION_DAYS: "${GPU_OPS_AUDIT_RETENTION_DAYS:-90}"
+      GPU_OPS_AUDIT_MAX_ROWS: "${GPU_OPS_AUDIT_MAX_ROWS:-100000}"
+    volumes:
+      - ./policies:/app/policies:ro
+      - simulator_data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=2)"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    ports:
+      - "${GPU_OPS_BIND_ADDRESS:-127.0.0.1}:9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    ports:
+      - "${GPU_OPS_BIND_ADDRESS:-127.0.0.1}:3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+
+volumes:
+  simulator_data:

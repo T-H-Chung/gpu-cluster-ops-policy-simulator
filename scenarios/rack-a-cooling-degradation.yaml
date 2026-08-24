@@ -1,0 +1,22 @@
+name: rack-a-cooling-degradation
+seed: 42
+description: Rack A cooling efficiency drops, inlet temperature rises, GPUs heat gradually, and thermal policy recommends cordoning a node and evicting a checkpointable batch pod.
+
+steps:
+  - at: 0s
+    action: set_cooling_efficiency
+    rack: rack-a
+    value: 0.15
+
+  - at: 30s
+    expected:
+      rack_cooling_headroom_pct: "< 10"
+
+  - at: 60s
+    expected:
+      max_gpu_temperature_celsius: "> 84"
+      throttle_reason: thermal_slowdown
+
+  - at: 90s
+    expected:
+      recommendation_status: pending_approval

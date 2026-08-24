@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: GPU Operations
+    orgId: 1
+    folder: GPU Operations
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 10
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards

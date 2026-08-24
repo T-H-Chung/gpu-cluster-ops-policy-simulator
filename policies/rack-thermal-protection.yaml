@@ -1,0 +1,41 @@
+name: rack-thermal-protection
+severity: critical
+
+when:
+  all:
+    - field: rack.cooling_headroom_pct
+      operator: less_than
+      value: 10
+      duration: 20s
+    - field: node.max_gpu_temperature_celsius
+      operator: greater_than
+      value: 84
+      duration: 10s
+
+constraints:
+  all:
+    - field: pod.annotation.policy.gpu-ops/sla-class
+      operator: not_equal
+      value: production
+    - field: pod.annotation.policy.gpu-ops/checkpointable
+      operator: equal
+      value: true
+    - field: pod.annotation.policy.gpu-ops/preemptible
+      operator: equal
+      value: true
+
+recommend:
+  - checkpoint_workload
+  - cordon_node
+  - evict_pod
+  - requeue_workload
+
+approval:
+  required: true
+
+guardrails:
+  max_nodes: 1
+  cooldown_seconds: 60
+  recommendation_ttl_seconds: 300
+  max_telemetry_age_seconds: 15
+  require_full_node_evacuation: true
