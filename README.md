@@ -4,6 +4,14 @@ A reproducible digital simulation of GPU cluster operations: synthetic telemetry
 
 The project emits synthetic telemetry modeled after NVIDIA DCGM Exporter, Kubernetes GPU workload records, Prometheus conventions, and Redfish-style environmental resources. It does not claim hardware-level physical accuracy. Its purpose is to reproduce realistic metric semantics, temporal behavior, cross-layer correlations, failure scenarios, and operational decision workflows.
 
+## Why This Project Matters
+
+GPU clusters are increasingly constrained by more than compute capacity. In real operations, workload scheduling, GPU telemetry, cooling headroom, power limits, grid events, and human approval all affect whether an action is safe. A useful operations system therefore needs to do more than display metrics: it must translate telemetry into decisions, explain those decisions, enforce guardrails, and preserve an audit trail.
+
+This project demonstrates that operational layer in a reproducible simulator. It models DCGM-style GPU metrics, Kubernetes-style workloads, Redfish-style facility signals, policy-based recommendations, approval workflows, guarded actions, and post-action verification. The goal is not hardware-level physical accuracy, but realistic operational semantics: how infrastructure state becomes an explainable and auditable control decision.
+
+By combining observability, policy evaluation, workload control, power management, and audit logging, this simulator shows how GPU infrastructure can be managed as a safety-aware decision system rather than a collection of disconnected dashboards and scripts.
+
 ## Scope
 
 - 1 rack
@@ -51,6 +59,19 @@ Normalized grid event
 Both paths share the same simulator state and actuators. Grid control is
 rejected when cooling headroom or GPU temperature places the rack under
 operational safety ownership.
+
+## Research Motivation
+
+The grid-responsive power-control path is motivated by the operational
+problems explored in the following papers:
+
+- [Turning AI Data Centers into Grid-Interactive Assets: Results from a Field Demonstration in Phoenix, Arizona](https://arxiv.org/abs/2507.00909)
+- [Power-Flexible AI Data Centers: A New Paradigm for Grid-Responsive Compute](https://arxiv.org/abs/2606.25098)
+
+The broader control model is an explicit, auditable loop:
+`grid event → SLA/flex tier → power model → policy decision → GPU cap/job pause/traffic shift → telemetry feedback → dashboard/audit log`.
+This release implements GPU power capping as the grid-response actuator; job
+pausing and traffic shifting are extension points for future control policies.
 
 ## Quick Start
 
