@@ -12,25 +12,6 @@ This project demonstrates that operational layer in a reproducible simulator. It
 
 By combining observability, policy evaluation, workload control, power management, and audit logging, this simulator shows how GPU infrastructure can be managed as a safety-aware decision system rather than a collection of disconnected dashboards and scripts.
 
-## Scope
-
-- 1 rack
-- 4 GPU nodes
-- 2 simulated GPUs per node
-- 8 total GPUs
-- 6 seeded jobs
-- 1 thermal degradation scenario
-- 1 YAML policy
-- checkpoint, cordon, evict, requeue, uncordon actions
-- grid flexibility offers, GPU power capping, target tracking, and ramped recovery
-- shared action arbitration that gives operational safety priority over grid control
-- FastAPI backend
-- Prometheus-compatible `/metrics`
-- SQLite-backed simulator state, recommendations, actions, and audit events
-- policy conditions, operators, constraints, and durations evaluated from YAML
-- optional API-key RBAC for viewer, operator, and admin roles
-- idempotent, revalidated approval execution
-
 ## Decision Loop
 
 ```text
@@ -72,6 +53,25 @@ The broader control model is an explicit, auditable loop:
 `grid event → SLA/flex tier → power model → policy decision → GPU cap/job pause/traffic shift → telemetry feedback → dashboard/audit log`.
 This release implements GPU power capping as the grid-response actuator; job
 pausing and traffic shifting are extension points for future control policies.
+
+## Scope
+
+- 1 rack
+- 4 GPU nodes
+- 2 simulated GPUs per node
+- 8 total GPUs
+- 6 seeded jobs
+- 1 thermal degradation scenario
+- 1 YAML policy
+- checkpoint, cordon, evict, requeue, uncordon actions
+- grid flexibility offers, GPU power capping, target tracking, and ramped recovery
+- shared action arbitration that gives operational safety priority over grid control
+- FastAPI backend
+- Prometheus-compatible `/metrics`
+- SQLite-backed simulator state, recommendations, actions, and audit events
+- policy conditions, operators, constraints, and durations evaluated from YAML
+- optional API-key RBAC for viewer, operator, and admin roles
+- idempotent, revalidated approval execution
 
 ## Quick Start
 
